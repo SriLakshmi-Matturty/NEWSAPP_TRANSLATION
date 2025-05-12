@@ -53,13 +53,12 @@ target_language_name = target_languages[lang_code]
 # Prepare translation prompt
 def translate_text(text, target_language):
     prompt = f"Translate the following text into {target_language}:\n\n\"{text}\""
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a professional translator."},
-            {"role": "user", "content": prompt}
-        ]
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt="Translate the following text to " + target_language_name + ": " + text,
+        max_tokens=100
     )
+
     return response['choices'][0]['message']['content'].strip()
 
 # Translate headline and summary
