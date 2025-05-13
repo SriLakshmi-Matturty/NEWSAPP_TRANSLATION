@@ -55,16 +55,21 @@ def translate_text(text, target_language_name):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that translates text."},
-            {"role": "user", "content": f"Translate the following to {target_language_name}:\n{text}"}
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that translates text."
+            },
+            {
+                "role": "user",
+                "content": f"Translate the following to {target_language_name}:\n{text}"
+            }
         ]
     )
     return response['choices'][0]['message']['content']
 
-
 # Translate headline and summary
-translated_headline = translate_text(headline, target_language_name)
-translated_summary = translate_text(summary, target_language_name)
+translated_headline = translate_text(headline, target_languages[lang_code])
+translated_summary = translate_text(summary, target_languages[lang_code])
 
 # Prepare output data
 output_data = {
