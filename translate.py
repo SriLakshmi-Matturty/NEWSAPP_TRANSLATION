@@ -1,18 +1,20 @@
-import openai
 import os
 import json
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
 
-# Set OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Get your API key from the .env file
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY is not set in .env file")
 
-if not openai.api_key:
-    raise ValueError("OPENAI_API_KEY is not set in the .env file")
+# Initialize the OpenAI client
+client = OpenAI(api_key=api_key)
 
-# Supported Indian languages
+# Indian languages
 target_languages = {
     'as': 'Assamese',
     'bn': 'Bengali',
@@ -34,7 +36,7 @@ target_languages = {
     'ur': 'Urdu',
 }
 
-# Read input JSON file
+# Read input.json
 with open("input.json", "r", encoding="utf-8") as file:
     data = json.load(file)
     headline = data.get("headline", "")
@@ -43,35 +45,26 @@ with open("input.json", "r", encoding="utf-8") as file:
     date = data.get("date", "")
     time = data.get("time", "")
 
-# Validate language code
 if lang_code not in target_languages:
     raise ValueError(f"Invalid language code: {lang_code}")
-
-# Get full language name
 target_language_name = target_languages[lang_code]
 
-# Prepare translation prompt
+# Translation function
 def translate_text(text, target_language_name):
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful assistant that translates text."
-            },
-            {
-                "role": "user",
-                "content": f"Translate the following to {target_language_name}:\n{text}"
-            }
+            {"role": "system", "content": "You are a helpful assistant that translates news headlines and summaries."},
+            {"role": "user", "content": f"Translate the following to {target_language_name}:\n{text}"}
         ]
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
-# Translate headline and summary
-translated_headline = translate_text(headline, target_languages[lang_code])
-translated_summary = translate_text(summary, target_languages[lang_code])
+# Translate both fields
+translated_headline = translate_text(headline, target_language_name)
+translated_summary = translate_text(summary, target_language_name)
 
-# Prepare output data
+# Prepare output
 output_data = {
     "headline": headline,
     "translated_headline": translated_headline,
@@ -81,8 +74,8 @@ output_data = {
     "time": time
 }
 
-# Save output JSON file
+# Save output
 with open("output.json", "w", encoding="utf-8") as file:
     json.dump(output_data, file, ensure_ascii=False, indent=4)
 
-print("Translation saved to output.json")
+print("✅ Translation saved to output.json")
