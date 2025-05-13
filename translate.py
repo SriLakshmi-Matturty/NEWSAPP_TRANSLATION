@@ -61,8 +61,8 @@ def translate_text(text, target_language_name):
     return response.choices[0].message.content
 
 # Translate both fields
-translated_headline = translate_text(headline, target_languages[lang__code])
-translated_summary = translate_text(summary, target_languages[lang__code])
+translated_headline = translate_text(headline, target_languages[lang_code])
+translated_summary = translate_text(summary, target_languages[lang_code])
 
 # Prepare output
 output_data = {
