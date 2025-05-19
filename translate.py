@@ -34,6 +34,7 @@ target_languages = {
     'ta': 'Tamil',
     'te': 'Telugu',
     'ur': 'Urdu',
+    'en': 'English'
 }
 
 # Read input.json
